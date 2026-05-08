@@ -25,12 +25,11 @@ describe("Auth + authorization + validation (API)", () => {
   beforeAll(() => {
     const mod = makeApp();
     app = mod.app;
-    db = mod.db;
     agent = request(app);
   });
 
   afterAll(() => {
-    db.close();
+    // db layer is handled internally; nothing to close here
   });
 
   test("register rejects invalid email", async () => {
