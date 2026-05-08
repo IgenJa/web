@@ -1,0 +1,33 @@
+# Mérföldkő értékelés — NE MÓDOSÍTSD EZT A FÁJLT!
+# Az értékelési logika a project-work-evaluator repóban van.
+
+name: "Mérföldkő értékelés"
+
+on:
+  schedule:
+    - cron: "0 22 29 3 *"
+    - cron: "0 22 26 4 *"
+    - cron: "0 22 10 5 *"
+  workflow_dispatch:
+    inputs:
+      milestone:
+        description: "Mérföldkő száma (1, 2 vagy 3)"
+        required: true
+        type: choice
+        options:
+          - "1"
+          - "2"
+          - "3"
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  evaluate:
+    uses: webfejlesztesi-keretrendszerek-2026/project-work-evaluator/.github/workflows/evaluate.yml@master
+    with:
+      milestone: ${{ inputs.milestone || '0' }}
+      trigger_type: ${{ github.event_name == 'schedule' && 'schedule' || 'manual' }}
+      caller_actor: ${{ github.actor }}
+    secrets: inherit
