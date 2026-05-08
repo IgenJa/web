@@ -50,7 +50,7 @@ app.post('/register', (req, res) => {
   const { username, password } = req.body;
   if (!isValidEmail(username)) return res.status(400).json({ error: "Érvénytelen email formátum!" });
   if (!isValidPassword(password)) return res.status(400).json({ error: "A jelszónak legalább 8 karakternek kell lennie!" });
-  const role = username === 'admin' ? 'admin' : 'user';
+  const role = String(username).toLowerCase() === 'admin@admin.hu' ? 'admin' : 'user';
   const hash = bcrypt.hashSync(password, 8);
   
   req.db
