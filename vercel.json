@@ -1,14 +1,9 @@
 {
   "rewrites": [
-    { "source": "/login", "destination": "/api" },
-    { "source": "/register", "destination": "/api" },
-    { "source": "/me", "destination": "/api" },
-    { "source": "/categories", "destination": "/api" },
-    { "source": "/posts", "destination": "/api" },
-    { "source": "/posts/:id", "destination": "/api" },
-    { "source": "/comments", "destination": "/api" },
-    { "source": "/comments/:id", "destination": "/api" },
-    { "source": "/comments/:postId", "destination": "/api" }
+    {
+      "source": "/(login|register|me|categories|posts|comments)(/.*)?",
+      "destination": "/api?path=/$1$2"
+    }
   ]
 }
 
