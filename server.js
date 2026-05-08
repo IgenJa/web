@@ -98,7 +98,10 @@ app.get('/categories', (req, res) => {
   req.db
     .all("SELECT * FROM categories", [])
     .then((rows) => res.json(rows))
-    .catch(() => res.status(500).json({ error: "Szerverhiba történt!" }));
+    .catch((err) => {
+      console.error("GET /categories failed:", err);
+      res.status(500).json({ error: "Szerverhiba történt!" });
+    });
 });
 
 // --- POSZTOK (CRUD 1) ---
@@ -108,7 +111,10 @@ app.get('/posts', (req, res) => {
   req.db
     .all("SELECT * FROM posts ORDER BY created_at DESC", [])
     .then((rows) => res.json(rows))
-    .catch(() => res.status(500).json({ error: "Szerverhiba történt!" }));
+    .catch((err) => {
+      console.error("GET /posts failed:", err);
+      res.status(500).json({ error: "Szerverhiba történt!" });
+    });
 });
 
 // Új poszt létrehozása (Create)

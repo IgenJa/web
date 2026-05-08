@@ -12,8 +12,11 @@ let _close = null;
 async function initSqlJsDb() {
   // sql.js needs async init
   // eslint-disable-next-line global-require
-  const initSqlJs = require("sql.js");
-  const SQL = await initSqlJs();
+  const initSqlJs = require("sql.js/dist/sql-wasm.js");
+  const wasmDir = path.dirname(require.resolve("sql.js/dist/sql-wasm.js"));
+  const SQL = await initSqlJs({
+    locateFile: (file) => path.join(wasmDir, file),
+  });
 
   let db;
   if (!isTest && fs.existsSync(filePath)) {
