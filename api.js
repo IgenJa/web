@@ -22,7 +22,10 @@ async function request(endpoint, options = {}) {
     }
     throw new Error("A szerver nem JSON választ adott.");
   }
-  if (!res.ok) throw new Error(data.error || `Hiba történt a szerverrel való kommunikációban! (${res.status})`);
+  if (!res.ok) {
+    const details = data?.details ? `\nRészletek: ${data.details}` : "";
+    throw new Error((data.error || `Hiba történt a szerverrel való kommunikációban! (${res.status})`) + details);
+  }
   return data;
 }
 
