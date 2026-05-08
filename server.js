@@ -14,7 +14,17 @@ app.use(express.json());
 app.use(express.static(__dirname));
 
 // --- 1. ADATBÁZIS INICIALIZÁLÁSA (5 ENTITÁS + 1 KAPCSOLÓTÁBLA) ---
-const db = new sqlite3.Database(process.env.DB_PATH || './forum.db');
+const dbPath =
+  process.env.DB_PATH ||
+  (process.env.VERCEL ? "/tmp/forum.db" : "./forum.db");
+
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error("SQLite open error:", err.message, "path=", dbPath);
+  } else {
+    console.log("SQLite opened:", dbPath);
+  }
+});
 
 db.serialize(() => {
   // 1. Users
@@ -154,14 +164,20 @@ app.get("/me", authenticate, (req, res) => {
 
 // Kategóriák lekérése
 app.get('/categories', (req, res) => {
-  db.all("SELECT * FROM categories", [], (err, rows) => res.json(rows));
+  db.all("SELECT * FROM categories", [], (err, rows) => {
+    if (err) return res.status(500).json({ error: "Szerverhiba történt!" });
+    res.json(rows);
+  });
 });
 
 // --- POSZTOK (CRUD 1) ---
 
 // Összes poszt listázása (Read)
 app.get('/posts', (req, res) => {
-  db.all("SELECT * FROM posts ORDER BY created_at DESC", [], (err, rows) => res.json(rows));
+  db.all("SELECT * FROM posts ORDER BY created_at DESC", [], (err, rows) => {
+    if (err) return res.status(500).json({ error: "Szerverhiba történt!" });
+    res.json(rows);
+  });
 });
 
 // Új poszt létrehozása (Create)
@@ -213,7 +229,17 @@ app.delete('/posts/:id', authenticate, (req, res) => {
 
 // Kommentek lekérése poszt azonosító alapján (Read)
 app.get('/comments/:postId', (req, res) => {
-  db.all("SELECT * FROM comments WHERE post_id = ?", [req.params.postId], (err, rows) => res.json(rows));
+  db.all("SELECT * FROM comments WHERE post_id = ?", [req.params.postId], (err, rows) => {
+    if (err) return res.status(500).json({ error: "Szerverhiba történt!" });
+    res.json(rows);
+  });
+});
+
+// Globális hibakezelő (Vercelen is JSON hibát adjon)
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err);
+  if (res.headersSent) return next(err);
+  res.status(500).json({ error: "Szerverhiba történt!" });
 });
 
 // Új komment (Create)

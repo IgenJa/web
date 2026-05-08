@@ -12,8 +12,17 @@ function getHeaders() {
 // Univerzális kérés-küldő függvény
 async function request(endpoint, options = {}) {
   const res = await fetch(`${API_URL}${endpoint}`, { ...options, headers: getHeaders() });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Hiba történt a szerverrel való kommunikációban!");
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    const text = await res.text().catch(() => "");
+    if (!res.ok) {
+      throw new Error(text || `Szerver hiba (${res.status})`);
+    }
+    throw new Error("A szerver nem JSON választ adott.");
+  }
+  if (!res.ok) throw new Error(data.error || `Hiba történt a szerverrel való kommunikációban! (${res.status})`);
   return data;
 }
 
